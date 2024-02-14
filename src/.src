@@ -1,0 +1,6 @@
+name: fir
+rtl:
+ - fir.vhdl
+ - stage.vhdl
+tb:
+ - tb_fir.vhdl

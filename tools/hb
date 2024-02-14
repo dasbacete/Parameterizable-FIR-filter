@@ -1,0 +1,66 @@
+#!/home/happybug/wdir/_work_env/bin/python3
+
+import os
+import argparse as arg
+import toolbox as tlb
+
+from pathlib import Path
+
+PROJ_PATH = os.environ['PROJ_DIR']
+
+ap = arg.ArgumentParser()
+
+ap.add_argument("-c", "--compile", action='store_true',
+                help="Compilation")
+ap.add_argument("-e", "--elab", action='store_true',
+                help="Elaboration")
+ap.add_argument("-t", "--top",
+                help="Top unit for non simulation based elaboration")
+ap.add_argument("-tb", "--testbench",
+                help="TB for simulation based elaboration")
+ap.add_argument("-s", "--sim", action='store_true',
+                help="Simulation")
+ap.add_argument("-sw", "--show_waveforms", action='store_true',
+                help="Show waveforms")
+ap.add_argument("-ra", "--run_all", action='store_true',
+                help="Run and simulate")
+ap.add_argument("-r", "--regs", action='store_true',
+                help="Create registers")
+ap.add_argument("-v", "--verbose", action='store_true',
+                help="Verbose")
+ap.add_argument("-d", "--define", nargs="+",
+                help="hw defines")
+ap.add_argument("-db", "--debug", action='store_true')
+
+_PAstderr = PIPEstderr = PIPEargs = vars(ap.parse_args())
+args = vars(ap.parse_args())
+
+
+def build_defines(dlist):
+    defines = {}
+    if (dlist is None):
+        return None
+    for i in range(0, len(dlist), 2):
+        defines[dlist[i]] = dlist[i+1]
+    return defines
+
+
+if __name__ == '__main__':
+    defines = build_defines(args['define'])
+    cwd = Path(os.getcwd())
+    if cwd.resolve() == Path(PROJ_PATH).resolve():
+        cwd = cwd / 'src'
+    project = tlb.project(cwd, args['debug'], True)
+    if (args['run_all']):
+        project.run(args['top'], args['testbench'],
+                    args['show_waveforms'], defines,
+                    args['verbose'])
+    elif (args['compile']):
+        project.compile(defines, args['verbose'])
+    elif (args['elab']):
+        project.elaborate(args['top'], args['testbench'],
+                          defines, args['verbose'])
+    elif (args['sim']):
+        project.simulate(args['show_waveforms'], args['verbose'])
+    elif (args['show_waveforms']):
+        project.show_waveforms(args['verbose'])

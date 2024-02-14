@@ -1,0 +1,9 @@
+#!/bin/zsh
+
+#set up vivado env
+source /home/happybug/Vivado/2023.1/settings64.sh
+
+#set global variables
+export PROJ_DIR=$PWD
+export PATH=$PATH:$PROJ_DIR/tools
+
